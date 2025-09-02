@@ -18,17 +18,21 @@ class AuthorController extends Controller
         // VERSIÓN 1: INEFICIENTE (PROBLEMA N+1)
         // ================================================================
 
-        $authors = Author::all(); // <-- La consulta "+1"
+        /* $authors = Author::all(); // <-- La consulta "+1"
         foreach ($authors as $author) {
             $author->books; // <-- Las "N" consultas dentro del bucle
         }
+ */
+        $authors = Author::select('id', 'name')
+            ->with(['books:id,title,author_id']) // selecciona los campos de Book
+            ->get();
 
         // ================================================================
         // VERSIÓN 2: OPTIMIZADA CON EAGER LOADING
         // ================================================================
 
-        /* $authors = Author::with('books')->get(); // <-- ¡La solución! 2 consultas.
- */
+        /*  $authors = Author::with('books')->get(); */ // <-- ¡La solución! 2 consultas.
+
         // ================================================================
         // VERSIÓN 3: OPTIMIZACIÓN FINAL CON CACHÉ
         // ================================================================
@@ -37,8 +41,8 @@ class AuthorController extends Controller
             // Este código solo se ejecuta si los datos no están en el caché.
             // Genera solo 2 consultas la primera vez.
             return Author::with('books')->get();
-        });
- */
+        }); */
+
         return view('authors', [
             'authors' => $authors
         ]);
